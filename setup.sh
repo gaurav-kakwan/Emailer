@@ -1,10 +1,11 @@
 #!/bin/bash
 
 # ============================================
-# Gmail Tool - VPS Auto Setup (Batch Update)
+# Gmail Tool - VPS Auto Setup (Updated Repo)
 # ============================================
 
-REPO_URL="https://github.com/gaurav-kakwan/anuj-pelu.git"
+# NEW REPO URL
+REPO_URL="https://github.com/gaurav-kakwan/Emailer.git"
 APP_DIR="/var/www/gmail-tool"
 APP_NAME="gmail-tool"
 
@@ -38,11 +39,13 @@ echo "[4/6] Installing PM2..."
 npm install -g pm2 > /dev/null 2>&1
 echo "      PM2: $(pm2 -v)"
 
-# 5. Clone/Update app
+# 5. Clone/Update app from NEW LOCATION
 echo "[5/6] Setting up app..."
 if [ -d "$APP_DIR" ]; then
     echo "      Updating existing code..."
     cd $APP_DIR
+    # Remote URL change karna padega agar purana link saved hai
+    git remote set-url origin $REPO_URL
     git pull origin main > /dev/null 2>&1
 else
     echo "      Cloning from GitHub..."
@@ -51,7 +54,7 @@ else
     cd $APP_DIR
 fi
 
-# Install Dependencies (Express, Nodemailer)
+# Install Dependencies
 npm install --production > /dev/null 2>&1
 
 # 6. PM2 start/restart
@@ -80,7 +83,7 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_cache_bypass $http_upgrade;
         
-        # Timeout settings for long sending processes
+        # Timeout settings
         proxy_read_timeout 300s;
         proxy_send_timeout 300s;
         proxy_connect_timeout 300s;
