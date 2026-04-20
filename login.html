@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Secure Access</title>
+<link rel="stylesheet" href="style.css">
+<style>
+/* Login page specific tweaks */
+body { display:flex; align-items:center; justify-content:center; min-height:100vh; }
+.card { width:100%; max-width:350px; padding: 40px; }
+.login-logo { font-size: 40px; text-align: center; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+ 
+<div class="card">
+<div class="login-logo">🔐</div>
+<h2 class="title">Admin Login</h2>
+ 
+    <div id="errMsg" style="color:#dc3545;font-size:14px;text-align:center;margin-bottom:14px;display:none;"></div>
+
+    <div class="form-grid">
+<div class="row">
+<input id="user" placeholder="Username" type="text">
+</div>
+ 
+<div class="row">
+<input id="pass" placeholder="Password" type="password">
+</div>
+</div>
+ 
+    <div class="btn-row">
+<button id="loginBtn">Login</button>
+</div>
+</div>
+ 
+<script>
+document.getElementById('loginBtn').addEventListener('click', async function () {
+    var btn = this;
+    var errEl = document.getElementById('errMsg');
+    errEl.style.display = 'none';
+    btn.disabled = true;
+    btn.textContent = 'Checking...';
+
+    try {
+        var res = await fetch('/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                username: document.getElementById('user').value,
+                password: document.getElementById('pass').value
+            })
+        });
+
+        var data = await res.json();
+
+        if (data.success) {
+            localStorage.setItem('sessionToken', data.token);
+            window.location.href = '/index.html';
+        } else {
+            errEl.textContent = data.msg;
+            errEl.style.display = 'block';
+            btn.disabled = false;
+            btn.textContent = 'Login';
+        }
+    } catch (err) {
+        errEl.textContent = "Connection Error";
+        errEl.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Login';
+    }
+});
+
+document.getElementById('pass').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') document.getElementById('loginBtn').click();
+});
+</script>
+</body>
+</html>

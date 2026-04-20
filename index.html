@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Secure Mail Console - Pro</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+ 
+<div class="page">
+<div class="card">
+<h2 class="title">📧 Secure Mail Console </h2>
+ 
+    <div class="form-grid">
+      <!-- Row 1: Excel Friendly Input -->
+<div class="row full-width">
+<textarea id="senderAccounts" placeholder="Paste Excel Data (Email, AppPass, Name)&#10;Supports Tab/Comma separated"></textarea>
+</div>
+ 
+      <!-- Row 2: Subject & Reply To -->
+<div class="row">
+<input id="subject" placeholder="Email Subject">
+<input id="replyTo" placeholder="Reply-To Email (Optional)">
+</div>
+ 
+      <!-- Row 3 -->
+<div class="row big-inputs">
+<textarea id="message" placeholder="Message Body"></textarea>
+<textarea id="to" placeholder="Recipients (Name, Website, Email)"></textarea>
+</div>
+</div>
+ 
+    <!-- Progress Section -->
+    <div class="progress-section" id="progressSection" style="display:none;">
+        <div class="status-text" id="statusText">Sending...</div>
+        <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progressBar"></div>
+        </div>
+    </div>
+
+    <div class="btn-row">
+<button id="sendBtn">Send All</button>
+<button id="logoutBtn">Logout</button>
+</div>
+</div>
+</div>
+ 
+<script src="script.js"></script>
+</body>
+</html>
