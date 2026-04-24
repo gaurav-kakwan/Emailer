@@ -8,7 +8,7 @@
  
 <div class="page">
 <div class="card">
-<h2 class="title">📧 Secure Mail Console </h2>
+<h2 class="title">📧 Bulk Mailer Pro</h2>
  
     <div class="form-grid">
       <!-- Row 1: Excel Friendly Input -->
@@ -16,9 +16,14 @@
 <textarea id="senderAccounts" placeholder="Paste Excel Data (Email, AppPass, Name)&#10;Supports Tab/Comma separated"></textarea>
 </div>
  
-      <!-- Row 2: Subject & Reply To -->
+      <!-- Row 2: Subject & Limit -->
 <div class="row">
 <input id="subject" placeholder="Email Subject">
+<input id="limitPerAccount" type="number" placeholder="Limit per Account (e.g. 50)" value="50">
+</div>
+
+      <!-- Row 2.1: Reply To -->
+<div class="row">
 <input id="replyTo" placeholder="Reply-To Email (Optional)">
 </div>
  
@@ -38,7 +43,7 @@
     </div>
 
     <div class="btn-row">
-<button id="sendBtn">Send All</button>
+<button id="sendBtn">Send All (Max Speed)</button>
 <button id="logoutBtn">Logout</button>
 </div>
 </div>
