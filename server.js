@@ -166,7 +166,7 @@ app.post('/send', async (req, res) => {
 
         const totalRecipients = recipients.length;
         const totalAccounts = senders.length;
-        const limit = parseInt(limitPerAccount) || 25; 
+        const limit = parseInt(limitPerAccount) || 50; 
         const BATCH_SIZE = 1; // 5-5 ke batch
 
         const senderUsage = new Array(totalAccounts).fill(0);
