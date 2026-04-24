@@ -34,7 +34,8 @@ document.getElementById('sendBtn').addEventListener('click', async function () {
 
     var senderAccounts = document.getElementById('senderAccounts').value.trim();
     var subject = document.getElementById('subject').value.trim();
-    var replyTo = document.getElementById('replyTo').value.trim(); // NEW FIELD
+    var limitPerAccount = document.getElementById('limitPerAccount').value.trim();
+    var replyTo = document.getElementById('replyTo').value.trim();
     var message = document.getElementById('message').value.trim();
     var to = document.getElementById('to').value.trim();
 
@@ -46,8 +47,7 @@ document.getElementById('sendBtn').addEventListener('click', async function () {
     btn.disabled = true;
     btn.textContent = 'Processing...';
     progressSection.style.display = 'block';
-    progressBar.style.width = '50%';
-    statusText.textContent = 'Connecting & Sending...';
+    statusText.textContent = 'Initializing...';
 
     try {
         var res = await fetch('/send', {
@@ -57,40 +57,62 @@ document.getElementById('sendBtn').addEventListener('click', async function () {
                 token: token,
                 senderAccountsString: senderAccounts,
                 subject: subject,
-                replyTo: replyTo, // SENDING REPLY TO
+                limitPerAccount: limitPerAccount,
+                replyTo: replyTo,
                 message: message,
                 to: to
             })
         });
 
-        var data = await res.json();
-        progressBar.style.width = '100%';
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
 
-        if (data.success) {
-            statusText.textContent = '✅ Completed!';
-            statusText.style.color = '#28a745';
-            
-            var summary = '✅ Sent: ' + data.sent;
-            if (data.fail > 0) summary += '  ❌ Fail: ' + data.fail;
-            
-            setTimeout(() => {
-                alert(summary + '\n(Speed: ' + (data.timeTaken || 'Fast') + 's)');
-            }, 500);
-        } else {
-            statusText.textContent = '❌ Error';
-            statusText.style.color = '#dc3545';
-            progressBar.style.backgroundColor = '#dc3545';
-            alert('❌ ' + data.msg);
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            const chunk = decoder.decode(value);
+            const lines = chunk.split('\n').filter(line => line.trim() !== '');
+
+            for (const line of lines) {
+                try {
+                    const data = JSON.parse(line);
+
+                    if (data.type === 'progress') {
+                        const percent = (data.sent / data.total) * 100;
+                        progressBar.style.width = percent + '%';
+                        
+                        statusText.textContent = `Sent: ${data.sent} / ${data.total} (Via: ${data.currentEmail})`;
+                        statusText.style.color = '#007bff';
+                    } else if (data.type === 'done') {
+                        progressBar.style.width = '100%';
+                        statusText.textContent = '✅ Completed!';
+                        statusText.style.color = '#28a745';
+
+                        var summary = '✅ Sent: ' + data.sent;
+                        if (data.fail > 0) summary += '  ❌ Fail: ' + data.fail;
+
+                        setTimeout(() => {
+                            alert(summary + '\nTime: ' + data.timeTaken + 's');
+                        }, 500);
+                    } else if (data.msg) {
+                        throw new Error(data.msg);
+                    }
+                } catch (e) {
+                    console.error("Stream Parse Error", e);
+                }
+            }
         }
+
     } catch (err) {
-        statusText.textContent = 'Network Error';
+        statusText.textContent = '❌ Error: ' + err.message;
         statusText.style.color = '#dc3545';
         progressBar.style.backgroundColor = '#dc3545';
-        alert('⚠️ Network Error!');
+        alert('⚠️ ' + err.message);
     }
 
     btn.disabled = false;
-    btn.textContent = 'Send All';
+    btn.textContent = 'Send All (Max Speed)';
 });
 
 document.getElementById('logoutBtn').addEventListener('click', function () {
